@@ -1,180 +1,233 @@
 <html>
 
 <head>
-    
+
 </head>
 
 <body>
 
-<input id='animateButton' type='button' value='Animate'/>
+    <input id='animateButton' type='button' value='Animate' />
 
-<canvas id="bgCanvas" width="1000" height="440">You need to a newer browser to see this awesomeness!</canvas>
-
-
-
-<script type="text/javascript">
-    
-    if (!window.requestNextAnimationFrame) {
-    window.requestNextAnimationFrame = (function() {
-        return window.webkitRequestAnimationFrame ||
-               window.mozRequestAnimationFrame    ||
-               window.oRequestAnimationFrame      ||
-               window.msRequestAnimationFrame     ||
-        function(callback, element) {
-            window.setTimeout(callback, 1000 / 60);
-        };
-    })();
-}
+    <canvas id="bgCanvas" width="1800" height="850">You need to a newer browser to see this awesomeness!</canvas>
 
 
-(function(win, d) {
 
-    var canvas = d.getElementById('bgCanvas'),
-        ctx = canvas.getContext('2d'),
-        animateButton = d.getElementById('animateButton'),
+    <script type="text/javascript">
+        var barraWidth, barraHeight, jogadorPosX, jogadorPosY, CimaPressionada, BaixoPressionada, velocidadeJogador, meninaCorrendo;
 
-        tree = new Image(),
-        nearTree = new Image(),
-        cloud = new Image(),
-        grass = new Image(),
-        grass2 = new Image(),
-        sky = new Image(),
-
-        paused = true,
-        lastTime = 0,
-        fps = 60,
-        lastFpsUpdate = {
-            time: 0,
-            value: 0
-        },
-
-        skyOffset = 0,
-        grassOffset = 0,
-        treeOffset = 0,
-        nearTreeOffset = 0,
-        cloudOffset = 0,
-
-        TREE_VELOCITY = 20,
-        FAST_TREE_VELOCITY = 40,
-        SKY_VELOCITY = 8,
-        GRASS_VELOCITY = 75;
+        if (!window.requestNextAnimationFrame) {
+            window.requestNextAnimationFrame = (function() {
+                return window.webkitRequestAnimationFrame ||
+                    window.mozRequestAnimationFrame ||
+                    window.oRequestAnimationFrame ||
+                    window.msRequestAnimationFrame ||
+                    function(callback, element) {
+                        window.setTimeout(callback, 1000 / 60);
+                    };
+            })();
+        }
 
 
-    // Functions.....................................................
+        (function(win, d) {
 
-    function erase() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
+            meninaCorrendo = new Image();
+            velocidadeJogador = 0.11111;
+            jogadorPosX = 1000;
+            jogadorPosY = 600;
+            barraWidth = 20;
+            barraHeight = 60;
 
-    function draw() {
+            var canvas = d.getElementById('bgCanvas'),
+                ctx = canvas.getContext('2d'),
+                animateButton = d.getElementById('animateButton'),
 
-        ctx.save();
-            skyOffset = skyOffset < canvas.width ? skyOffset + SKY_VELOCITY / fps : 0;
-            grassOffset = grassOffset < canvas.width ? grassOffset + GRASS_VELOCITY / fps : 0;
-            treeOffset = treeOffset < canvas.width ? treeOffset + TREE_VELOCITY / fps : 0;
-            nearTreeOffset = nearTreeOffset < canvas.width ? nearTreeOffset + FAST_TREE_VELOCITY / fps : 0;
+                tree = new Image(),
+                nearTree = new Image(),
+                cloud = new Image(),
+                grass = new Image(),
+                grass2 = new Image(),
+                sky = new Image(),
+                meiofio = new Image(),
+                parati = new Image(),
 
-            cloudOffset = cloudOffset < canvas.width ? cloudOffset + FAST_TREE_VELOCITY / fps : 0;
+
+                paused = true,
+                lastTime = 0,
+                fps = 60,
+                lastFpsUpdate = {
+                    time: 0,
+                    value: 0
+                },
+
+                skyOffset = 0,
+                grassOffset = 0,
+                treeOffset = 0,
+                nearTreeOffset = 0,
+                cloudOffset = 0,
+                meiofioalto = 0,
+
+                TREE_VELOCITY = 75,
+                FAST_TREE_VELOCITY = 40,
+                SKY_VELOCITY = 90,
+                GRASS_VELOCITY = 75;
+
+            document.addEventListener('keyup', keyUp, false);
+            document.addEventListener('keydown', keyDown, false);
 
 
-            // sky
-            ctx.save();
+
+            // Functions.....................................................
+
+            //teclado do personagem
+            function keyDown(e) {
+                if (e.keyCode == 38) {
+                    CimaPressionada = true;
+                } else if (e.keyCode == 40) {
+                    BaixoPressionada = true;
+                }
+            }
+
+            function keyUp(e) {
+                if (e.keyCode == 38) {
+                    CimaPressionada = false;
+                } else if (e.keyCode == 40) {
+                    BaixoPressionada = false;
+                }
+            }
+
+
+            function erase() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            function draw() {
+
+                ctx.save();
+                skyOffset = skyOffset < canvas.width ? skyOffset + SKY_VELOCITY / fps : 0;
+                grassOffset = grassOffset < canvas.width ? grassOffset + GRASS_VELOCITY / fps : 0;
+                treeOffset = treeOffset < canvas.width ? treeOffset + TREE_VELOCITY / fps : 0;
+                nearTreeOffset = nearTreeOffset < canvas.width ? nearTreeOffset + FAST_TREE_VELOCITY / fps : 0;
+
+                cloudOffset = cloudOffset < canvas.width ? cloudOffset + FAST_TREE_VELOCITY / fps : 0;
+                meiofioalto = meiofioalto < canvas.width ? meiofioalto + GRASS_VELOCITY / fps : 0;
+
+
+
+                // sky
+                ctx.save();
                 ctx.translate(-skyOffset, 0);
-                    ctx.drawImage(sky, 0, 0);
-                    ctx.drawImage(sky, sky.width - 2, 0);
-            ctx.restore();
+                ctx.drawImage(sky, 0, 0);
+                ctx.drawImage(sky, sky.width - 2, 0);
+                ctx.restore();
 
-            ctx.save();
-                ctx.translate(-cloudOffset,0);
+                // clound
+                ctx.save();
+                ctx.translate(-cloudOffset, 0);
                 ctx.drawImage(cloud, 0, 0);
-                ctx.drawImage(cloud, cloud.width - 2, 0);
-            ctx.restore();
+                ctx.drawImage(cloud, cloud.width - 4, 0);
+                ctx.restore();
 
-            // small tree
-            ctx.save();
-                ctx.translate(-treeOffset, 0);
-                    ctx.drawImage(tree, 100, 240);
-                    ctx.drawImage(tree, 1100, 240);
-                    ctx.drawImage(tree, 400, 240);
-                    ctx.drawImage(tree, 1400, 240);
-                    ctx.drawImage(tree, 700, 240);
-                    ctx.drawImage(tree, 1700, 240);
-            ctx.restore();
 
-            // nearTree
-            ctx.save();
-                ctx.translate(-nearTreeOffset, 0);
-                    ctx.drawImage(nearTree, 250, 220);
-                    ctx.drawImage(nearTree, 1250, 220);
-                    ctx.drawImage(nearTree, 800, 220);
-                    ctx.drawImage(nearTree, 1800, 220);
-            ctx.restore();
 
-            // Grass
-            ctx.save();
+                // Grass
+                ctx.save();
                 ctx.translate(-grassOffset, 0);
-                    ctx.drawImage(grass, 0, canvas.height - grass.height);
-                    ctx.drawImage(grass, grass.width - 5, canvas.height - grass.height);
-                    ctx.drawImage(grass2, 0, canvas.height - grass2.height);
-                    ctx.drawImage(grass2, grass2.width, canvas.height - grass2.height);
-            ctx.restore();
-        ctx.restore();
-    }
+                ctx.drawImage(grass, 0, canvas.height - grass.height);
+                ctx.drawImage(grass, grass.width - 5, canvas.height - grass.height);
+                ctx.drawImage(grass2, 0, canvas.height - grass2.height);
+                ctx.drawImage(grass2, grass2.width, canvas.height - grass2.height);
+                ctx.restore();
+                ctx.restore();
 
-    function calculateFps(now) {
-        var fps = 1000 / (now - lastTime);
-        lastTime = now;
-        
-        return fps;
-    }
+                //meioFio
+                ctx.save();
+                ctx.translate(-meiofioalto, 0);
+                ctx.drawImage(meiofio, 0, 35);
+                ctx.drawImage(meiofio, meiofio.width - 5, 35);
+                ctx.restore();
 
-    function animate(now) {
-        if (now === undefined){
-            now = +new Date;
-        }
+                ctx.save();
+                ctx.drawImage(parati, 0, 540);
+                ctx.restore();
 
-        fps = calculateFps(now);
+                setInterval(animarPersonagem, 30);
 
-        if (! paused) {
-            erase();
-            draw();
-        }
 
-        requestNextAnimationFrame(animate);
-    }
 
-    // Event handlers................................................
-    animateButton.onclick = function(e) {
-        paused = paused ? false : true;
-        if (paused) {
-            animateButton.value = 'Animate';
-        } else {
-            animateButton.value = 'Pause';
-        }
-    };
+            }
 
-    // Initialization................................................
-    //tree.src = 'http://anti-code.com/imgs/smalltree.png';
-    //nearTree.src = 'http://anti-code.com/imgs/tree-twotrunks.png';
+            function animarPersonagem() {
+                if (CimaPressionada != BaixoPressionada) {
+                    if (CimaPressionada) {
+                        if (jogadorPosY > 0) {
+                            jogadorPosY -= velocidadeJogador;
+                        }
+                    } else {
+                        if (jogadorPosY > (canvas.height - grass2.height) || BaixoPressionada) {
+                            jogadorPosY += velocidadeJogador;
+                        }
+                    }
+                }
 
-    //smCloud.src = 'Nuvens.png';
-    //medCloud.src = 'http://anti-code.com/imgs/cloud-med.png';
-    //bigCloud.src = 'http://anti-code.com/imgs/cloud-big.png';
-    //cloud.src = 'Nuvens.png';
-    grass.src = 'http://anti-code.com/imgs/grass.png';
-    grass2.src = 'http://anti-code.com/imgs/grass2.png';
-    
-    sky.src = 'Fundo.png';
+                ctx.drawImage(meninaCorrendo, jogadorPosX, jogadorPosY);
 
-    sky.onload = function(e) {
-        draw();
-    };
+            }
 
-    requestNextAnimationFrame(animate);
+            function calculateFps(now) {
+                var fps = 1000 / (now - lastTime);
+                lastTime = now;
 
-})(window, document);
+                return fps;
+            }
 
-</script>
+            function animate(now) {
+                if (now === undefined) {
+                    now = +new Date;
+                }
+
+                fps = calculateFps(now);
+
+                if (!paused) {
+                    erase();
+                    draw();
+                }
+
+                requestNextAnimationFrame(animate);
+            }
+
+            // Event handlers................................................
+            animateButton.onclick = function(e) {
+                paused = paused ? false : true;
+                if (paused) {
+                    animateButton.value = 'Animate';
+                } else {
+                    animateButton.value = 'Pause';
+                }
+            };
+
+            // Initialization................................................
+            //tree.src = 'http://anti-code.com/imgs/smalltree.png';
+            //nearTree.src = 'http://anti-code.com/imgs/tree-twotrunks.png';
+
+            //smCloud.src = 'Nuvens.png';
+            //medCloud.src = 'http://anti-code.com/imgs/cloud-med.png';
+            //bigCloud.src = 'http://anti-code.com/imgs/cloud-big.png';
+            cloud.src = 'Nuvens.png';
+            grass.src = 'Pista.png';
+            grass2.src = 'Meio Fio Baixo.png';
+            meiofio.src = 'Meio Fio Cima.png';
+            sky.src = 'Fundo.png';
+            parati.src = 'Parati.png';
+            meninaCorrendo.src = 'menina-correndo.png'
+
+            sky.onload = function(e) {
+                draw();
+            };
+
+            requestNextAnimationFrame(animate);
+
+        })(window, document);
+    </script>
 
 </body>
 
