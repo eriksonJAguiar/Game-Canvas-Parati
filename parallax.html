@@ -17,7 +17,8 @@
 
         if (!window.requestNextAnimationFrame) {
             window.requestNextAnimationFrame = (function() {
-                return window.webkitRequestAnimationFrame ||
+                return window.requestAnimationFrame ||
+                    window.webkitRequestAnimationFrame ||
                     window.mozRequestAnimationFrame ||
                     window.oRequestAnimationFrame ||
                     window.msRequestAnimationFrame ||
@@ -49,11 +50,12 @@
                 sky = new Image(),
                 meiofio = new Image(),
                 parati = new Image(),
+                rock = new Image(),
 
 
                 paused = true,
                 lastTime = 0,
-                fps = 60,
+                fps = 30,
                 lastFpsUpdate = {
                     time: 0,
                     value: 0
@@ -95,6 +97,25 @@
                 }
             }
 
+            function randomIntFromInterval(min,max)
+            {
+                return Math.floor(Math.random()*(max-min+1)+min);
+            }       
+
+            function gerarPedras(){
+                y = randomIntFromInterval(meiofio.y,grass2.y);
+                x = randomIntFromInterval(meninaCorrendo.x + 2,canvas.width);
+
+                ctx.beginPath();
+                ctx.arc(600,900,20,0,2*Math.PI);
+                ctx.stroke();
+                ctx.fill();
+                //ctx.restore();
+
+                console.log(x);
+                console.log(grass.y);
+            
+            }
 
             function erase() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -150,10 +171,13 @@
                 ctx.drawImage(parati, 0, 540);
                 ctx.restore();
 
-                setInterval(animarPersonagem, 30);
+
+                //setInterval(animarPersonagem, 300);
+
+                //requestNextAnimationFrame(animarPersonagem);
 
 
-
+                animarPersonagem();
             }
 
             function animarPersonagem() {
@@ -170,6 +194,8 @@
                 }
 
                 ctx.drawImage(meninaCorrendo, jogadorPosX, jogadorPosY);
+
+                requestNextAnimationFrame(animarPersonagem);
 
             }
 
@@ -218,7 +244,8 @@
             meiofio.src = 'Meio Fio Cima.png';
             sky.src = 'Fundo.png';
             parati.src = 'Parati.png';
-            meninaCorrendo.src = 'menina-correndo.png'
+            meninaCorrendo.src = 'menina-correndo.png';
+            rock.src = 'Rock.png';
 
             sky.onload = function(e) {
                 draw();
